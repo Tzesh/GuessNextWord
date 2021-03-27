@@ -8,30 +8,35 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
+    private static Scanner scanner = new Scanner(System.in);
+    private static GuessNextWord guessNextWord = new GuessNextWord();
+
     public static void main(String[] args) throws IOException {
-        GuessNextWord guessNextWord = new GuessNextWord();
-        Scanner scanner = new Scanner(System.in);
-        guessNextWord.startGame();
-        while (true) {
-            guessNextWord.guess(scanner.nextLine());
-        }
-        /*
-        System.out.println("What do you want to set this for?");
-        Scanner scanner = new Scanner(System.in);
-        if (scanner.nextLine().equals("server")) {
+        System.out.println("Menu" +
+                "\na) Host game" +
+                "\nb) Join game");
+        String option = scanner.nextLine();
+        if (option.equals("a")) {
             TCPServer server = new TCPServer();
             server.start(6666);
-        } if (scanner.nextLine().equals("player")) {
+            System.out.println("Waiting for Player 2 to start");
+            while (!server.isConnected()) { }
+            System.out.println("Player 2 has joined!");
+            guessNextWord.startGame();
+        }
+        if (option.equals("b")) {
             TCPClient client = new TCPClient();
             client.startConnection("127.0.0.1", 6666);
-            while (true) {
-                String response = client.sendMessage(scanner.nextLine());
-                scanner.nextLine();
-
+            while (guessNextWord.isGameOver()) {
+                if (client.sendMessage("is it my turn").equals("yes")) {
+                    String response = scanner.nextLine();
+                    client.sendMessage(response);
+                }
             }
         }
-        //TCPServer server = new TCPServer();
-        //server.start(6666);
-        */
+    }
+
+    public static boolean getPlayer() {
+        return guessNextWord.getPlayer();
     }
 }

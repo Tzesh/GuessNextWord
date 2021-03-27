@@ -1,6 +1,6 @@
 package edu.anadolu.tcp;
 
-import edu.anadolu.game.GuessNextWord;
+import edu.anadolu.Main;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,15 +20,18 @@ public class TCPServer {
         clientSocket = serverSocket.accept();
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String greeting = in.readLine();
-        if ("hello server".equals(greeting)) {
-            out.println("hello client");
-            stop();
-            System.out.println(1);
-            System.exit(0);
-        } else {
-            out.println("unrecognised greeting");
-        }
+    }
+
+    public String getWord() throws IOException {
+        return in.readLine();
+    }
+
+    public boolean isConnected() {
+        return clientSocket.isConnected();
+    }
+
+    public void informTurn() throws IOException {
+        if (in.readLine().equals("is it my turn")) out.print(!Main.getPlayer());
     }
 
     public void stop() throws IOException {

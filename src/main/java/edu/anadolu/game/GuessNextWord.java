@@ -1,22 +1,23 @@
 package edu.anadolu.game;
 
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class GuessNextWord {
+    private boolean isGameOver;
     private final int delay = 1000;
     private final int period = 1000;
     private int interval;
     private Timer timer;
-    private HashSet<String> vocabulary = new HashSet<>();
-    private String lastWord = null;
+    private HashSet<String> vocabulary;
+    private String lastWord;
     private boolean player = false;
 
     public void startGame() {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Input seconds => : ");
+        isGameOver = false;
+        vocabulary = new HashSet<>();
+        lastWord = null;
         timer = new Timer();
         interval = 30;
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -25,11 +26,15 @@ public class GuessNextWord {
                 setInterval();
             }
         }, delay, period);
-        System.out.println("Game over!");
+        System.out.println("Game has begun!");
     }
 
 
     public boolean guess(String word) {
+        if (word.isBlank() || word.isEmpty() || word.length() < 3) {
+            System.out.println("Wrong usage! Please make sure that your word is at least consists 3 letters");
+            return false;
+        }
         if (vocabulary.contains(word)) {
             System.out.println("This word has been used already");
             return false;
@@ -50,14 +55,22 @@ public class GuessNextWord {
         if (interval == 1) {
             System.out.println("Timed out!");
             System.out.println("Player " + (player ? 1 : 2) + " won!");
+            isGameOver = true;
             timer.cancel();
         }
         return --interval;
     }
 
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public boolean getPlayer() {
+        return player;
+    }
+
     private void changeTurns() {
         player = !player;
-        System.out.println("Player " + (player ? 1 : 2) + "'s turn!");
         interval = 30;
     }
 
