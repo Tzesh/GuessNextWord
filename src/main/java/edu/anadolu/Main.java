@@ -23,6 +23,16 @@ public class Main {
             while (!server.isConnected()) { }
             System.out.println("Player 2 has joined!");
             guessNextWord.startGame();
+            while (guessNextWord.isGameOver()) {
+                if (guessNextWord.getPlayer()) {
+                    String word = scanner.nextLine();
+                    guessNextWord.guess(word);
+                }
+                else {
+                    server.informTurn();
+                    guessNextWord.guess(server.getWord());
+                }
+            }
         }
         if (option.equals("b")) {
             TCPClient client = new TCPClient();
