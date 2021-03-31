@@ -2,6 +2,8 @@ package edu.anadolu.client;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 
 public class WriteThread extends Thread {
@@ -15,7 +17,7 @@ public class WriteThread extends Thread {
 
 		try {
 			OutputStream output = socket.getOutputStream();
-			writer = new PrintWriter(output, true);
+			writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true);
 		} catch (IOException ex) {
 			System.out.println("Error getting output stream: " + ex.getMessage());
 			ex.printStackTrace();
@@ -23,16 +25,17 @@ public class WriteThread extends Thread {
 	}
 
 	public void run() {
-		Console console = System.console();
-
-		String userName = console.readLine("\nEnter your name: ");
+		Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
+		System.out.println("\nEnter your nickname: ");
+		String userName = scanner.nextLine();
 		client.setUserName(userName);
 		writer.println(userName);
 
-		String text;
+		String text = null;
 
 		do {
-			text = console.readLine("[" + userName + "]: ");
+			text = scanner.nextLine();
+			if (text.isEmpty()) continue;
 			writer.println(text);
 
 		} while (!text.equals("quit"));

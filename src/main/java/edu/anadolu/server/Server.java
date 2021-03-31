@@ -72,6 +72,10 @@ public class Server {
         }
     }
 
+    boolean isGameOn() {
+        return isGameOn;
+    }
+
     void loginAsAdministrator(String password, UserThread user) {
         if (!password.equals(this.password)) {
             user.sendMessage("Password is wrong!");
@@ -83,7 +87,7 @@ public class Server {
         }
         administrator = user;
         user.sendMessage("Welcome back, sir.");
-        broadcast("Administrator " + user.getName() + " has logged in!", user);
+        broadcast("Administrator " + user.getUsername() + " has logged in!", user);
     }
 
     void startGame(UserThread administrator, Locale locale) {
@@ -118,8 +122,9 @@ public class Server {
     }
 
     public boolean guess(String word, UserThread user) {
-        if (word.isBlank() || word.isEmpty()) {
-            user.sendMessage("Wrong usage! Please make sure that your word is at least consists 3 letters");
+        System.out.println(word);
+        if (word.isBlank() || word.isEmpty() || word.contains("\\p{Punct}") || word.contains("\\s+")) {
+            user.sendMessage("Wrong usage!");
             return false;
         }
         if (vocabulary.contains(word)) {
@@ -144,10 +149,11 @@ public class Server {
     }
 
     private int setInterval() {
-        if (interval == 15) broadcast("15 seconds left", players.peek());
-        if (interval < 10) broadcast(String.format("%s second(s) left!", interval), players.peek());
+        if (interval == 15) players.peek().sendMessage("15 seconds left");
+        if (interval < 10) players.peek().sendMessage(String.format("%s second(s) left!", interval));
         if (interval == 1) {
-            broadcastAll("Timed out!\n" + players.poll().getName() + " has won!");
+            players.poll();
+            broadcastAll("Timed out!\n" + players.peek().getUsername() + " has won!");
             isGameOn = false;
             timer.cancel();
         }
