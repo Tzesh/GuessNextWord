@@ -1,11 +1,17 @@
+/**
 package edu.anadolu.game;
 
+import edu.anadolu.Main;
+
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class GuessNextWord {
-    private boolean isGameOver;
+    private Scanner scanner = new Scanner(System.in);
+    private boolean isGameStarted;
     private final int delay = 1000;
     private final int period = 1000;
     private int interval;
@@ -14,8 +20,8 @@ public class GuessNextWord {
     private String lastWord;
     private boolean player = false;
 
-    public void startGame() {
-        isGameOver = false;
+    public void startGame() throws IOException {
+        isGameStarted = true;
         vocabulary = new HashSet<>();
         lastWord = null;
         timer = new Timer();
@@ -27,11 +33,23 @@ public class GuessNextWord {
             }
         }, delay, period);
         System.out.println("Game has begun!");
+        while (isGameStarted) {
+            guess(getWord());
+        }
+    }
+
+    public String getWord() throws IOException {
+        if (player) {
+            System.out.println("Your turn: " + lastWord);
+            String word = scanner.nextLine();
+            return word;
+        }
+        else return Main.getword(lastWord);
     }
 
 
     public boolean guess(String word) {
-        if (word.isBlank() || word.isEmpty() || word.length() < 3) {
+        if (word.isBlank() || word.isEmpty()) {
             System.out.println("Wrong usage! Please make sure that your word is at least consists 3 letters");
             return false;
         }
@@ -55,14 +73,14 @@ public class GuessNextWord {
         if (interval == 1) {
             System.out.println("Timed out!");
             System.out.println("Player " + (player ? 1 : 2) + " won!");
-            isGameOver = true;
+            isGameStarted = false;
             timer.cancel();
         }
         return --interval;
     }
 
     public boolean isGameOver() {
-        return isGameOver;
+        return isGameStarted;
     }
 
     public boolean getPlayer() {
@@ -73,9 +91,5 @@ public class GuessNextWord {
         player = !player;
         interval = 30;
     }
-
-    public static void main(String[] args) {
-        GuessNextWord guessNextWord = new GuessNextWord();
-        guessNextWord.startGame();
-    }
 }
+ */

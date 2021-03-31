@@ -1,15 +1,14 @@
 package edu.anadolu;
 
-import edu.anadolu.game.GuessNextWord;
-import edu.anadolu.tcp.TCPClient;
-import edu.anadolu.tcp.TCPServer;
+import edu.anadolu.client.Client;
+import edu.anadolu.server.Server;
 
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
-    private static GuessNextWord guessNextWord = new GuessNextWord();
 
     public static void main(String[] args) throws IOException {
         System.out.println("Menu" +
@@ -17,36 +16,46 @@ public class Main {
                 "\nb) Join game");
         String option = scanner.nextLine();
         if (option.equals("a")) {
-            TCPServer server = new TCPServer();
-            server.start(6666);
-            System.out.println("Waiting for Player 2 to start");
-            while (!server.isConnected()) { }
-            System.out.println("Player 2 has joined!");
-            guessNextWord.startGame();
-            while (guessNextWord.isGameOver()) {
-                if (guessNextWord.getPlayer()) {
-                    String word = scanner.nextLine();
-                    guessNextWord.guess(word);
-                }
-                else {
-                    server.informTurn();
-                    guessNextWord.guess(server.getWord());
-                }
-            }
+            int port = getInteger("Please declaim a port to host the server: ");
+            String password = getString("Please enter your administrator password: ");
+            Server server = new Server(port, password);
+            server.execute();
         }
         if (option.equals("b")) {
-            TCPClient client = new TCPClient();
-            client.startConnection("127.0.0.1", 6666);
-            while (guessNextWord.isGameOver()) {
-                if (client.sendMessage("is it my turn").equals("yes")) {
-                    String response = scanner.nextLine();
-                    client.sendMessage(response);
-                }
-            }
+            String hostname = getString("Please type your hostname: ");
+            int port = getInteger("Please enter your port to join to the server: ");
+            Client client = new Client(hostname, port);
+            client.execute();
         }
     }
 
-    public static boolean getPlayer() {
-        return guessNextWord.getPlayer();
+    public static int getInteger(String message) {
+        int integer = 0;
+        System.out.println(message);
+        try {
+            while (true) {
+                integer = scanner.nextInt();
+                if (integer > 0) return integer;
+            }
+        }
+        catch (InputMismatchException exception) {
+            System.out.println("Please provide a suitable positive integer value");
+        }
+        return 6666; // default
+    }
+
+    public static String getString(String message) {
+        String string = "";
+        System.out.println(message);
+        try {
+            while (true) {
+                string = scanner.nextLine();
+                if (!string.isEmpty()) return string;
+            }
+        }
+        catch (InputMismatchException exception) {
+            System.out.println("Please provide a suitable string hostname");
+        }
+        return "localhost"; // default
     }
 }

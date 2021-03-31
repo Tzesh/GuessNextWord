@@ -1,3 +1,4 @@
+/**
 package edu.anadolu.tcp;
 
 import edu.anadolu.Main;
@@ -9,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+@Deprecated
 public class TCPServer {
     private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -30,8 +32,9 @@ public class TCPServer {
         return clientSocket.isConnected();
     }
 
-    public void informTurn() throws IOException {
+    public void informTurn(String lastWord) throws IOException {
         if (in.readLine().equals("is it my turn")) out.print(!Main.getPlayer());
+        out.print(lastWord);
     }
 
     public void stop() throws IOException {
@@ -41,3 +44,4 @@ public class TCPServer {
         serverSocket.close();
     }
 }
+ */

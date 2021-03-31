@@ -23,6 +23,10 @@ public class TCPClient {
         return resp;
     }
 
+    public String readLine() throws IOException {
+        return in.readLine();
+    }
+
     public void stopConnection() throws IOException {
         in.close();
         out.close();
