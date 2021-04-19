@@ -35,11 +35,13 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 if (isGameOn) {
-                    System.out.println("There is a game currently running on in the server, please try again later.");
+                    UserThread newUser = new UserThread(socket, this);
+                    newUser.sendMessage("There is a game currently running on in the server, please try again later");
                     continue;
                 }
                 if (userThreads.size() == 2) {
-                    System.out.println("Maximum 2 clients can connect to this server, please try again later.");
+                    UserThread newUser = new UserThread(socket, this);
+                    newUser.sendMessage("Server is full 2/2");
                     continue;
                 }
                 System.out.println("New user connected");

@@ -10,6 +10,7 @@ public class WriteThread extends Thread {
 	private PrintWriter writer;
 	private Socket socket;
 	private Client client;
+	private String userName;
 
 	public WriteThread(Socket socket, Client client) {
 		this.socket = socket;
@@ -29,10 +30,12 @@ public class WriteThread extends Thread {
 		String userName = scanner.nextLine();
 		client.setUserName(userName);
 		writer.println(userName);
+		this.userName = userName;
 
 		String text = null;
 
 		do {
+			System.out.print("[" + userName + "]: ");
 			text = scanner.nextLine();
 			if (text.isEmpty()) continue;
 			writer.println(text);

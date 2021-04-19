@@ -21,12 +21,13 @@ public class Main {
         String option = scanner.nextLine();
         if (option.equals("a")) {
             int port = getInteger("Please declaim a port to host the server: ");
-            String password = getString("Please enter your administrator password: ");
+            String password = getString("Please enter your administrator password: ", false);
+            System.out.println("Starting the server on port '" + port + "' and administrator password '" + password + "' ");
             Server server = new Server(port, password);
             server.execute();
         }
         if (option.equals("b")) {
-            String hostname = getString("Please type your hostname: ");
+            String hostname = getString("Please type your hostname: ", true);
             int port = getInteger("Please enter your port to join to the server: ");
             Client client = new Client(hostname, port);
             client.execute();
@@ -43,12 +44,12 @@ public class Main {
             }
         }
         catch (InputMismatchException exception) {
-            System.out.print("Please provide a suitable positive integer value");
+            System.out.println("Returning default port '6666' since the value is not integer");
         }
         return 6666;
     }
 
-    public static String getString(String message) {
+    public static String getString(String message, boolean isHost) {
         String string = "";
         System.out.print(message);
         try {
@@ -58,8 +59,8 @@ public class Main {
             }
         }
         catch (InputMismatchException exception) {
-            System.out.print("Please provide a suitable string hostname");
+            System.out.print("Please provide a suitable string.");
         }
-        return "localhost"; // default
+        return isHost ? "localhost" : "12345"; // default
     }
 }
