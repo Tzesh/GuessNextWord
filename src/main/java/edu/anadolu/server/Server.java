@@ -38,6 +38,10 @@ public class Server {
                     System.out.println("There is a game currently running on in the server, please try again later.");
                     continue;
                 }
+                if (userThreads.size() == 2) {
+                    System.out.println("Maximum 2 clients can connect to this server, please try again later.");
+                    continue;
+                }
                 System.out.println("New user connected");
 
                 UserThread newUser = new UserThread(socket, this);

@@ -15,9 +15,9 @@ public class Main {
     public static void main(String[] args) throws IOException {
         System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8)); // to avoid OS dependent outputs
 
-        System.out.println("Menu" +
-                "\na) Host game" +
-                "\nb) Join game");
+        System.out.println("GuessNextWord | Menu" +
+                "\na) Host game: You can host a game up to 2 clients to let them play" +
+                "\nb) Join game: You can join a game to compete with another client");
         String option = scanner.nextLine();
         if (option.equals("a")) {
             int port = getInteger("Please declaim a port to host the server: ");
