@@ -14,8 +14,7 @@ public class ReadThread extends Thread {
 		this.client = client;
 
 		try {
-			InputStream input = socket.getInputStream();
-			reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
+			reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
 		} catch (IOException ex) {
 			System.out.println("Error getting input stream: " + ex.getMessage());
 			ex.printStackTrace();

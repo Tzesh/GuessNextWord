@@ -3,3 +3,7 @@
 /build/
 /build/classes/java/main/
 /build/classes/java/test/
+/out/
+/out/production/
+/out/production/classes/
+/out/production/resources/

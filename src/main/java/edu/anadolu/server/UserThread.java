@@ -21,11 +21,11 @@ public class UserThread extends Thread {
             BufferedReader reader = new BufferedReader((new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8)));
             writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8)), true);
 
-            printUsers();
-
             String userName = reader.readLine();
             server.addUserName(userName);
             this.username = userName;
+
+            printUsers();
 
             String serverMessage = "New user connected: " + userName;
             server.addUserName(userName);

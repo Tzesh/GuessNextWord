@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.*;
 
 public class Server {
+    // Server structures
     private int port;
     private ServerSocket serverSocket = new ServerSocket(port);
     private UserThread administrator = null;
@@ -59,8 +60,6 @@ public class Server {
         for (UserThread aUser : userThreads) {
             if (excludeUser != null)
                 if (aUser != excludeUser) {
-                    aUser.sendMessage(message);
-                } else {
                     aUser.sendMessage(message);
                 }
         }

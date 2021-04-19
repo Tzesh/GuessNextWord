@@ -4,6 +4,8 @@ import edu.anadolu.client.Client;
 import edu.anadolu.server.Server;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -11,6 +13,8 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException {
+        System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+
         System.out.println("Menu" +
                 "\na) Host game" +
                 "\nb) Join game");

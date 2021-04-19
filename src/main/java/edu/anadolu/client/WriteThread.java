@@ -16,8 +16,7 @@ public class WriteThread extends Thread {
 		this.client = client;
 
 		try {
-			OutputStream output = socket.getOutputStream();
-			writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true);
+			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 		} catch (IOException ex) {
 			System.out.println("Error getting output stream: " + ex.getMessage());
 			ex.printStackTrace();
@@ -34,6 +33,7 @@ public class WriteThread extends Thread {
 		String text = null;
 
 		do {
+			System.out.println(text);
 			text = scanner.nextLine();
 			if (text.isEmpty()) continue;
 			writer.println(text);
