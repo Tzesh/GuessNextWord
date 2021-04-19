@@ -13,7 +13,7 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException {
-        System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+        System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8)); // to avoid OS dependent outputs
 
         System.out.println("Menu" +
                 "\na) Host game" +
@@ -35,7 +35,7 @@ public class Main {
 
     public static int getInteger(String message) {
         int integer = 0;
-        System.out.println(message);
+        System.out.print(message);
         try {
             while (true) {
                 integer = scanner.nextInt();
@@ -43,14 +43,14 @@ public class Main {
             }
         }
         catch (InputMismatchException exception) {
-            System.out.println("Please provide a suitable positive integer value");
+            System.out.print("Please provide a suitable positive integer value");
         }
-        return 6666; // default
+        return 6666;
     }
 
     public static String getString(String message) {
         String string = "";
-        System.out.println(message);
+        System.out.print(message);
         try {
             while (true) {
                 string = scanner.nextLine();
@@ -58,7 +58,7 @@ public class Main {
             }
         }
         catch (InputMismatchException exception) {
-            System.out.println("Please provide a suitable string hostname");
+            System.out.print("Please provide a suitable string hostname");
         }
         return "localhost"; // default
     }

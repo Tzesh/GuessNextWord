@@ -25,7 +25,7 @@ public class WriteThread extends Thread {
 
 	public void run() {
 		Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
-		System.out.println("\nEnter your nickname: ");
+		System.out.print("\nEnter your nickname: ");
 		String userName = scanner.nextLine();
 		client.setUserName(userName);
 		writer.println(userName);
@@ -33,7 +33,6 @@ public class WriteThread extends Thread {
 		String text = null;
 
 		do {
-			System.out.println(text);
 			text = scanner.nextLine();
 			if (text.isEmpty()) continue;
 			writer.println(text);

@@ -116,12 +116,12 @@ public class Server {
         }, 1000, 1000);
         isGameOn = true;
         broadcastAll("The game has started!");
+        System.out.println("The game has started!");
         players.addAll(userThreads);
         players.peek().sendMessage("It's your turn, just type a meaningful word between 30 seconds.");
     }
 
     public boolean guess(String word, UserThread user) {
-        System.out.println(word);
         if (word.isBlank() || word.isEmpty() || word.contains("\\p{Punct}") || word.contains("\\s+")) {
             user.sendMessage("Wrong usage!");
             return false;
@@ -134,6 +134,7 @@ public class Server {
             user.sendMessage("New word is not starting with the last 2 letters of the last one");
             return false;
         }
+        System.out.println("[" + user.getUsername() + "]: " + word);
         vocabulary.add(word);
         lastWord = word;
         changeTurns(user);
