@@ -30,3 +30,5 @@ We have such 2 use cases due to lowering the words has to be applied according t
 A simple game can be seen as below:
 
 ![simple game in TR](https://i.imgur.com/fc10LU7.png)
+
+You can type 'quit' to disconnect from server.
