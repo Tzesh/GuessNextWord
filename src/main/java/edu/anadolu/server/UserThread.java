@@ -6,17 +6,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public class UserThread extends Thread {
-    private Socket socket;
-    private Server server;
+    private final Socket socket;
+    private final Server server;
     private PrintWriter writer;
     private String username;
 
-    public UserThread(Socket socket, Server server) {
+    public UserThread(Socket socket, Server server) { // default constructor
         this.socket = socket;
         this.server = server;
     }
 
-    public void run() {
+    public void run() { // thread's all functionality
         try {
             BufferedReader reader = new BufferedReader((new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8)));
             writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8)), true);
@@ -74,7 +74,7 @@ public class UserThread extends Thread {
         }
     }
 
-    void printUsers() {
+    void printUsers() { // to print users
         if (server.hasUsers()) {
             writer.println("Connected users: " + server.getUserNames());
         } else {
@@ -82,20 +82,20 @@ public class UserThread extends Thread {
         }
     }
 
-    String getUsername() {
+    String getUsername() { // to get username
         return username;
     }
 
-    void sendMessage(String message) {
+    void sendMessage(String message) { // to send message from server using this thread
         writer.println(message);
     }
 
-    public Socket getSocket() {
+    public Socket getSocket() { // to get socket
         return socket;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj) { // to make comparisions
         if (obj instanceof UserThread) {
             return socket == ((UserThread) obj).getSocket();
         }

@@ -22,24 +22,24 @@ public class Server {
     private Timer timer;
     private Locale locale = null;
 
-    public Server(int port, String password) throws IOException {
+    public Server(int port, String password) throws IOException { // default constructor
         this.password = password;
         this.port = port;
     }
 
-    public void execute() {
+    public void execute() { // executing the server
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println("Server is listening on port " + port);
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                if (isGameOn) {
+                if (isGameOn) { // if game is on then just ignore the new users
                     UserThread newUser = new UserThread(socket, this);
                     newUser.sendMessage("There is a game currently running on in the server, please try again later");
                     continue;
                 }
-                if (userThreads.size() == 2) {
+                if (userThreads.size() == 2) { // we'll need at least and at most 2 users
                     UserThread newUser = new UserThread(socket, this);
                     newUser.sendMessage("Server is full 2/2");
                     continue;
@@ -57,7 +57,7 @@ public class Server {
         }
     }
 
-    void broadcast(String message, UserThread excludeUser) {
+    void broadcast(String message, UserThread excludeUser) { // to broadcast users with excluding one
         if (isGameOn) {
             if (players.peek() == excludeUser) guess(message.toLowerCase(locale), excludeUser);
             else excludeUser.sendMessage("It's not your turn, please wait your turn!");
@@ -71,17 +71,17 @@ public class Server {
         }
     }
 
-    private void broadcastAll(String message) {
+    private void broadcastAll(String message) { // to broadcast users without excluding
         for (UserThread aUser : userThreads) {
             aUser.sendMessage(message);
         }
     }
 
-    boolean isGameOn() {
+    boolean isGameOn() { // to check is game on or off
         return isGameOn;
     }
 
-    void loginAsAdministrator(String password, UserThread user) {
+    void loginAsAdministrator(String password, UserThread user) { // to log in as administrator
         if (!password.equals(this.password)) {
             user.sendMessage("Password is wrong!");
             return;
