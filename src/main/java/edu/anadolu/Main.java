@@ -1,7 +1,9 @@
 package edu.anadolu;
 
-import edu.anadolu.client.Client;
-import edu.anadolu.server.Server;
+import edu.anadolu.tcp.client.Client;
+import edu.anadolu.tcp.server.Server;
+import edu.anadolu.udp.client.UDPClient;
+import edu.anadolu.udp.server.UDPServer;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -23,13 +25,13 @@ public class Main {
             int port = getInteger("Please declaim a port to host the server: ");
             String password = getString("Please enter your administrator password: ", false);
             System.out.println("Starting the server on port '" + port + "' and administrator password '" + password + "' ");
-            Server server = new Server(port, password);
+            UDPServer server = new UDPServer(password, port);
             server.execute();
         }
         if (option.equals("b")) { // joining game
             String hostname = getString("Please type your hostname: ", true);
             int port = getInteger("Please enter your port to join to the server: ");
-            Client client = new Client(hostname, port);
+            UDPClient client = new UDPClient(hostname, port);
             client.execute();
         }
     }

@@ -1,4 +1,4 @@
-package edu.anadolu.client;
+package edu.anadolu.tcp.client;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

@@ -1,4 +1,4 @@
-package edu.anadolu.server;
+package edu.anadolu.tcp.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
