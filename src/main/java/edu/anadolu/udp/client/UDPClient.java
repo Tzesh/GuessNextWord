@@ -7,7 +7,6 @@ import java.net.UnknownHostException;
 public class UDPClient {
     private final InetAddress hostname;
     private final int port;
-    private String userName;
 
     public UDPClient(String hostname, int port) throws UnknownHostException { // default constructor
         this.hostname = InetAddress.getByName(hostname);
@@ -22,14 +21,5 @@ public class UDPClient {
         sender.start();
         ReceiverThread receiver = new ReceiverThread(sender.getSocket());
         receiver.start();
-
-    }
-
-    String getUserName() {
-        return this.userName;
-    }
-
-    void setUserName(String userName) {
-        this.userName = userName;
     }
 }

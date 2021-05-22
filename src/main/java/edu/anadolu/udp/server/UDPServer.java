@@ -24,12 +24,12 @@ public class UDPServer {
     private Timer timer;
     private Locale locale = null;
 
-    public UDPServer(String password, int port) {
+    public UDPServer(String password, int port) { // constructor of udp server
         this.password = password;
         this.serverPort = port;
     }
 
-    public void execute() throws IOException { // executing the server
+    public void execute() throws IOException { // thread's all functionality
         this.udpServerSocket = new DatagramSocket(serverPort);
 
         while (true) {
@@ -46,13 +46,13 @@ public class UDPServer {
             int clientPort = receivePacket.getPort();
             portSet.add(clientPort);
 
-            if (clientMessage.contains("My username is, ")) {
+            if (clientMessage.contains("My username is, ")) { // to get username of the client since we don't have a user thread
                 String username = clientMessage.split(", ")[1];
                 usernames.put(clientPort, username);
                 continue;
             }
 
-            if (clientMessage.contains("login")) {
+            if (clientMessage.contains("login")) { // to let users to login as administrator
                 String[] args = clientMessage.split(" ");
                 if (args.length == 1 || args.length > 2) {
                     sendMessage("Please re-type your password", clientIP, clientPort);
@@ -63,17 +63,17 @@ public class UDPServer {
                 }
             }
 
-            if (clientMessage.equals("start the game TR")) {
+            if (clientMessage.equals("start the game TR")) { // to let administrators to start the game in TR
                 startGame(clientPort, new Locale("tr", "TR"), clientIP);
                 continue;
             }
 
-            if (clientMessage.equals("start the game EN")) {
+            if (clientMessage.equals("start the game EN")) { // to let administrators to start the game in EN
                 startGame(clientPort, new Locale("en", "US"), clientIP);
                 continue;
             }
 
-            clientMessage = "[" + usernames.get(clientPort) + "]: " + clientMessage;
+            clientMessage = "[" + usernames.get(clientPort) + "]: " + clientMessage; // we have to append username of the sender to avoid confusions
 
             System.out.println(clientMessage);
 
@@ -81,22 +81,23 @@ public class UDPServer {
         }
     }
 
-    void sendMessage(String message, InetAddress clientIP, Integer clientPort) throws IOException {
+    void sendMessage(String message, InetAddress clientIP, Integer clientPort) throws IOException { // method to send message to a client
         byte[] sendData = new byte[1024];
         sendData = message.getBytes(StandardCharsets.UTF_8);
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientIP, clientPort);
         udpServerSocket.send(sendPacket);
     }
 
-    void broadcast(String message, InetAddress clientIP) throws IOException {
+    void broadcast(String message, InetAddress clientIP) throws IOException { // to broadcast users without excluding
         for (Integer port : portSet) {
             sendMessage(message, clientIP, port);
         }
     }
 
-    void exclusiveBroadcast(String message, InetAddress clientIP, Integer clientPort) throws IOException {
+    void exclusiveBroadcast(String message, InetAddress clientIP, Integer clientPort) throws IOException { // to broadcast users with excluding the sender
         if (isGameOn) {
-            if (players.peek().equals(clientPort)) guess(message.replace("[" + usernames.get(clientPort) + "]: ", "").toLowerCase(locale), clientPort, clientIP);
+            if (players.peek().equals(clientPort))
+                guess(message.replace("[" + usernames.get(clientPort) + "]: ", "").toLowerCase(locale), clientPort, clientIP);
             else sendMessage("It's not your turn, please wait your turn!", clientIP, clientPort);
             return;
         }

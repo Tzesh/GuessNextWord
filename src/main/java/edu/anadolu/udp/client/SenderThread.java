@@ -30,7 +30,7 @@ public class SenderThread extends Thread {
         this.stopped = true;
     }
 
-    public void run() { // functionality of read thread
+    public void run() { // functionality of the sender thread
         try {
             BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             System.out.println("Please enter your username: ");
@@ -41,10 +41,9 @@ public class SenderThread extends Thread {
                     return;
 
                 String clientMessage;
-                if (isUsernameSent) {
+                if (isUsernameSent) { // if we already informed the server then we may send messages
                     clientMessage = inFromUser.readLine();
-                }
-                else {
+                } else { // we have to inform the server, username
                     clientMessage = "My username is, " + username;
                     isUsernameSent = true;
                 }
@@ -60,7 +59,7 @@ public class SenderThread extends Thread {
 
                 socket.send(sendPacket);
 
-                Thread.yield();
+                Thread.yield(); // to avoid redundant resource usage
             }
         } catch (IOException ex) {
             System.err.println(ex);

@@ -14,11 +14,7 @@ public class ReceiverThread extends Thread {
         this.socket = socket;
     }
 
-    public void halt() {
-        this.stopped = true;
-    }
-
-    public void run() {
+    public void run() {  // functionality of the receiver thread
         byte[] receiveData = new byte[1024];
 
         while (true) {
@@ -28,13 +24,12 @@ public class ReceiverThread extends Thread {
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             try {
                 socket.receive(receivePacket);
-                String serverReply =  new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
+                String serverReply = new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
 
                 System.out.println(serverReply);
 
                 Thread.yield();
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 System.err.println(ex);
             }
         }
