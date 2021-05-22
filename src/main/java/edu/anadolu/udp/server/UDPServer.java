@@ -1,21 +1,20 @@
 package edu.anadolu.udp.server;
 
-import edu.anadolu.tcp.server.UserThread;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class UDPServer {
     // Server structures
-    private DatagramSocket udpServerSocket = null;
+    private DatagramSocket udpServerSocket;
     public HashSet<Integer> portSet = new HashSet<Integer>();
     public HashMap<Integer, String> usernames = new HashMap<>();
     private Integer administrator = null;
     private String password = null;
-    private int port;
+    private int serverPort;
     private LinkedList<Integer> players = new LinkedList<>();
     // Game structures
     private boolean isGameOn = false;
@@ -27,93 +26,85 @@ public class UDPServer {
 
     public UDPServer(String password, int port) {
         this.password = password;
-        this.port = port;
+        this.serverPort = port;
     }
 
     public void execute() throws IOException { // executing the server
-        this.udpServerSocket = new DatagramSocket(port);
-
-        System.out.println("Server started...\n");
+        this.udpServerSocket = new DatagramSocket(serverPort);
 
         while (true) {
-            // Create byte buffers to hold the messages to send and receive
             byte[] receiveData = new byte[1024];
 
-            // Create an empty DatagramPacket packet
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 
-            // Block until there is a packet to receive, then receive it  (into our empty packet)
             udpServerSocket.receive(receivePacket);
 
-            // Extract the message from the packet and make it into a string, then trim off any end characters
-            String clientMessage = (new String(receivePacket.getData())).trim();
-            int clientport = receivePacket.getPort();
+            String clientMessage = (new String(receivePacket.getData(), StandardCharsets.UTF_8)).trim();
+
             InetAddress clientIP = receivePacket.getAddress();
+
+            int clientPort = receivePacket.getPort();
+            portSet.add(clientPort);
 
             if (clientMessage.contains("My username is, ")) {
                 String username = clientMessage.split(", ")[1];
-                usernames.put(clientport, username);
+                usernames.put(clientPort, username);
+                continue;
             }
 
             if (clientMessage.contains("login")) {
                 String[] args = clientMessage.split(" ");
                 if (args.length == 1 || args.length > 2) {
-                    sendMessage("Please re-type your password", clientport);
+                    sendMessage("Please re-type your password", clientIP, clientPort);
                     continue;
                 } else {
-                    loginAsAdministrator(args[1], clientport);
+                    loginAsAdministrator(args[1], clientPort, clientIP);
                     continue;
                 }
             }
+
             if (clientMessage.equals("start the game TR")) {
-                startGame(clientport, new Locale("tr", "TR"));
+                startGame(clientPort, new Locale("tr", "TR"), clientIP);
                 continue;
             }
+
             if (clientMessage.equals("start the game EN")) {
-                startGame(clientport, new Locale("en", "US"));
+                startGame(clientPort, new Locale("en", "US"), clientIP);
                 continue;
             }
 
-            System.out.println("[" + usernames.get(clientport) + "]: " + clientMessage);
+            clientMessage = "[" + usernames.get(clientPort) + "]: " + clientMessage;
 
-            broadcast(clientMessage, clientport, clientIP);
+            System.out.println(clientMessage);
+
+            exclusiveBroadcast(clientMessage, clientIP, clientPort);
         }
     }
 
-    void broadcast(String message, Integer clientPort, InetAddress clientIP) throws IOException { // to broadcast users with excluding one
-        if (isGameOn) {
-            if (players.peek() == port) guess(message.toLowerCase(locale), clientPort);
-            else sendMessage("It's not your turn, please wait your turn!", clientPort);
-            return;
-        }
-
+    void sendMessage(String message, InetAddress clientIP, Integer clientPort) throws IOException {
         byte[] sendData = new byte[1024];
-        sendData = message.getBytes();
-        for (Integer port : portSet) {
-            if (port != clientPort) {
-                // Create a DatagramPacket to send, using the buffer, the clients IP address, and the clients port
-                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientIP, port);
-                // Send the echoed message
-                udpServerSocket.send(sendPacket);
-            }
-        }
-    }
-
-    void sendMessage(String message, Integer clientPort) throws IOException {
-        byte[] sendData = new byte[1024];
-        sendData = message.getBytes();
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getLocalHost(), clientPort);
+        sendData = message.getBytes(StandardCharsets.UTF_8);
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientIP, clientPort);
         udpServerSocket.send(sendPacket);
     }
 
-    private void broadcastAll(String message) throws IOException { // to broadcast users without excluding
-        byte[] sendData = new byte[1024];
-        sendData = message.getBytes();
+    void broadcast(String message, InetAddress clientIP) throws IOException {
         for (Integer port : portSet) {
-            // Create a DatagramPacket to send, using the buffer, the clients IP address, and the clients port
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getLocalHost(), port);
-            // Send the echoed message
-            udpServerSocket.send(sendPacket);
+            sendMessage(message, clientIP, port);
+        }
+    }
+
+    void exclusiveBroadcast(String message, InetAddress clientIP, Integer clientPort) throws IOException {
+        if (isGameOn) {
+            if (players.peek().equals(clientPort)) guess(message.replace("[" + usernames.get(clientPort) + "]: ", "").toLowerCase(locale), clientPort, clientIP);
+            else sendMessage("It's not your turn, please wait your turn!", clientIP, clientPort);
+            return;
+        }
+
+        for (Integer port : portSet) {
+            if (!port.equals(clientPort)) {
+                sendMessage(message, clientIP, port);
+            }
         }
     }
 
@@ -121,35 +112,34 @@ public class UDPServer {
         return isGameOn;
     }
 
-    void loginAsAdministrator(String password, int clientPort) throws IOException { // to log in as administrator
+    void loginAsAdministrator(String password, Integer clientPort, InetAddress clientIP) throws IOException { // to log in as administrator
         if (!password.equals(this.password)) {
-            sendMessage("Password is wrong!", clientPort);
+            sendMessage("Password is wrong!", clientIP, clientPort);
             return;
         }
         if (administrator != null) {
-            sendMessage("There can be only one administrator at a time!", clientPort);
+            sendMessage("There can be only one administrator at a time!", clientIP, clientPort);
             return;
         }
         administrator = clientPort;
-        sendMessage("Welcome back, sir.", clientPort);
-        broadcastAll("Administrator " + usernames.get(clientPort) + " has logged in!");
+        sendMessage("Welcome back, sir.", clientIP, clientPort);
+        broadcast("Administrator " + usernames.get(clientPort) + " has logged in!", clientIP);
     }
 
-    void startGame(int administrator, Locale locale) throws IOException {
+    void startGame(int administratorPort, Locale locale, InetAddress clientIP) throws IOException {
         if (this.administrator == null) {
-            sendMessage("Seems like administrator has not logged in yet", port);
+            sendMessage("Seems like administrator has not logged in yet", clientIP, administratorPort);
             return;
         }
-        if (this.administrator != administrator) {
-            sendMessage("You are not administrator!", port);
+        if (this.administrator != administratorPort) {
+            sendMessage("You are not administrator!", clientIP, administratorPort);
             return;
         }
         if (isGameOn) {
-            sendMessage("There is a already game running on!", port);
+            sendMessage("There is a already game running on!", clientIP, administratorPort);
             return;
         }
         this.locale = locale;
-        vocabulary = new HashSet<>();
         vocabulary = new HashSet<>();
         lastWord = null;
         timer = new Timer();
@@ -158,52 +148,53 @@ public class UDPServer {
 
             public void run() {
                 try {
-                    setInterval();
+                    setInterval(clientIP);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }, 1000, 1000);
         isGameOn = true;
-        broadcastAll("The game has started!");
+        broadcast("The game has started!", clientIP);
         System.out.println("The game has started!");
         players.addAll(portSet);
-        sendMessage("It's your turn, just type a meaningful word between 30 seconds.", players.peek());
+        sendMessage("It's your turn, just type a meaningful word between 30 seconds.", clientIP, players.peek());
     }
 
-    public boolean guess(String word, Integer clientPort) throws IOException {
+    public boolean guess(String word, Integer clientPort, InetAddress clientIP) throws IOException {
         if (word.isBlank() || word.isEmpty() || word.contains("\\p{Punct}") || word.contains("\\s+")) {
-            sendMessage("Wrong usage!", clientPort);
+            sendMessage("Wrong usage!", clientIP, clientPort);
             return false;
         }
         if (vocabulary.contains(word)) {
-            sendMessage("This word has been used already", clientPort);
+            sendMessage("This word has been used already", clientIP, clientPort);
             return false;
         }
         if (lastWord != null && !word.substring(0, 2).equals(lastWord.substring(lastWord.length() - 2))) {
-            sendMessage("New word is not starting with the last 2 letters of the last one", clientPort);
+            sendMessage("New word is not starting with the last 2 letters of the last one", clientIP, clientPort);
             return false;
         }
         System.out.println("[" + usernames.get(clientPort) + "]: " + word);
         vocabulary.add(word);
         lastWord = word;
-        changeTurns(clientPort);
+        changeTurns(clientPort, clientIP);
         return true;
     }
 
-    private void changeTurns(Integer clientPort) throws IOException {
+    private void changeTurns(Integer clientPort, InetAddress clientIP) throws IOException {
         players.poll();
         players.add(clientPort);
-        sendMessage("It is your turn, last word is: " + lastWord, players.peek());
+        sendMessage("It is your turn, last word is: " + lastWord, clientIP, players.peek());
         interval = 30;
     }
 
-    private int setInterval() throws IOException {
-        if (interval == 15) sendMessage("15 seconds left", players.peek());
-        if (interval < 10) sendMessage(String.format("%s second(s) left!", interval), players.peek());
+    private int setInterval(InetAddress clientIP) throws IOException {
+        if (interval == 15) sendMessage("15 seconds left", clientIP, players.peek());
+        if (interval < 10)
+            sendMessage(String.format("%s second(s) left!", interval), clientIP, players.peek());
         if (interval == 1) {
             players.poll();
-            broadcastAll("Timed out!\n" + usernames.get(players.peek()) + " has won!");
+            broadcast("Timed out!\n" + usernames.get(players.peek()) + " has won!", clientIP);
             isGameOn = false;
             timer.cancel();
         }

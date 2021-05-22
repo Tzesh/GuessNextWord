@@ -3,6 +3,7 @@ package edu.anadolu.udp.client;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.nio.charset.StandardCharsets;
 
 
 public class ReceiverThread extends Thread {
@@ -27,7 +28,7 @@ public class ReceiverThread extends Thread {
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             try {
                 socket.receive(receivePacket);
-                String serverReply =  new String(receivePacket.getData(), 0, receivePacket.getLength());
+                String serverReply =  new String(receivePacket.getData(), 0, receivePacket.getLength(), StandardCharsets.UTF_8);
 
                 System.out.println(serverReply);
 

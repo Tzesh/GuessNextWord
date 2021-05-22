@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 public class SenderThread extends Thread {
     private final DatagramSocket socket;
@@ -31,14 +32,7 @@ public class SenderThread extends Thread {
 
     public void run() { // functionality of read thread
         try {
-            //send blank message
-            byte[] data = new byte[1024];
-            data = "".getBytes();
-            DatagramPacket blankPacket = new DatagramPacket(data, data.length, hostname, port);
-            socket.send(blankPacket);
-
-            // Create input stream
-            BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             System.out.println("Please enter your username: ");
             this.username = inFromUser.readLine();
 
@@ -46,7 +40,6 @@ public class SenderThread extends Thread {
                 if (stopped)
                     return;
 
-                // Message to send
                 String clientMessage;
                 if (isUsernameSent) {
                     clientMessage = inFromUser.readLine();
@@ -59,16 +52,12 @@ public class SenderThread extends Thread {
                 if (clientMessage.equals("quit"))
                     break;
 
-                // Create byte buffer to hold the message to send
                 byte[] sendData = new byte[1024];
 
-                // Put this message into our empty buffer/array of bytes
-                sendData = clientMessage.getBytes();
+                sendData = clientMessage.getBytes(StandardCharsets.UTF_8);
 
-                // Create a DatagramPacket with the data, IP address and port number
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, hostname, port);
 
-                // Send the UDP packet to server
                 socket.send(sendPacket);
 
                 Thread.yield();
