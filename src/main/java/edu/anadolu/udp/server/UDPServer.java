@@ -77,6 +77,10 @@ public class UDPServer {
 
             System.out.println(clientMessage);
 
+            String receivedMessage = "'" + clientMessage + "' has been received.";
+
+            sendMessage(receivedMessage, clientIP, clientPort);
+
             exclusiveBroadcast(clientMessage, clientIP, clientPort);
         }
     }
